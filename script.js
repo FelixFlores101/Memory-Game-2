@@ -131,10 +131,13 @@ function revealCard(element) {
 }
 
 function deleteCardFromDeck(card) {
-  card.style.opacity = 0;
+  setTimeout(function() {
+    card.style.opacity = 0;
+
+  }, 400),
   card.classList.add('hidden')
   if(duplicates.length == 0) {
-    alert('level 1 completed')
+    return restartGame()
   } else {
     duplicates.splice(duplicates.indexOf(card.children[0].className), 1)
     console.log(duplicates)
@@ -163,10 +166,14 @@ function getRandomIcon() {
 
 
 }
-createCards(cardAmt)   // createCards what did we pass into it? we are calling the function createCards. we're gonna pass in an amount of cards
-addEventToCards()
-createTimer()
-getMatchingCards()
+
+function startGame() {
+  createCards(cardAmt)   // createCards what did we pass into it? we are calling the function createCards. we're gonna pass in an amount of cards
+  addEventToCards()
+  createTimer()
+  getMatchingCards()
+ 
+}
 
 
 var totalTime = '30' //seconds 
@@ -174,7 +181,7 @@ var totalTime = '30' //seconds
 function createTimer() {
   setInterval(function() {
     if(totalTime == 0) {
-      alert('GAME OVER')
+      restartGame()
     } else {
       totalTime = totalTime - 1
       let timer = document.querySelector('.timer')
@@ -183,3 +190,21 @@ function createTimer() {
     }
   }, 1000)
 }
+
+function removeGame() {
+  gameContainer.innerHTML = ''
+  totalTime = '30'
+}
+
+function restartGame() {
+  let restart = confirm('Game Over, Restart?')
+  if(restart) {
+    removeGame()
+    setTimeout(function() {
+      startGame()
+    }, 200)
+  }
+}
+
+startGame()
+
