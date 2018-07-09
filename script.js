@@ -76,13 +76,27 @@ function createCards(amountOfCards) {   // this is the initial function to set u
   }
 }
 
-
+function checkCards() {
+  let cards = document.getElementsByClassName('card')
+  for(let i=0;  i < cards.length;i+=1) {
+    let picks = 0
+    if(cards[i].classList.contains('picked')) {
+      picks++
+      console.log(picks)
+    }
+    if(picks > 2) {
+      alert('you cant click more than 2')
+    }
+  }
+}
 function addEventToCards() {
   let cards = document.getElementsByClassName('card')
 
   for(let i=0; i < cards.length; i+=1) {
     cards[i].addEventListener('click', function() {
-      revealCard(cards[i])
+      if(!cards[i].classList.contains('picked')) {
+        revealCard(cards[i])
+      }
     })
   }
 }
@@ -98,46 +112,53 @@ function getMatchingCards() {
         let newObj = {}
         newObj.icon = cards[i].children[0].className
         duplicates.push(cards[i].children[0].className)
+        
       } else {
         cardIcons.push(cards[i].children[0].className)
       }
-      // console.log(cardIcons)
-      // console.log('duplicates', duplicates)
+
 
   }
 }
 
+getMatchingCards()
 // reveal the card that is being clicked
 let pick = []
 function revealCard(element) {
+  element.classList.add('picked')
   element.children[1].style.display = 'none'
   let pickObj = {
     element: element,
     icon: element.children[0].className,
   }
   pick.push(pickObj)
-  if(pick[0] && pick[1] && pick[0].icon !== pick[1].icon) {
+  if(pick[0].icon !== pick[1].icon) {   //work on pick[0].=== pick [1]
     hideCard(pick[0].element)
     hideCard(pick[1].element)
     pick = []
     // hideCard(pick[1].element)
   }
-  if(pick[0] &&pick[1] && pick[0].icon == pick[1].icon) {
+  else if(pick[0].icon == pick[1].icon) {  // play with the &&&
     // user is correct
-    deleteCardFromDeck(pick[0].element);
-    deleteCardFromDeck(pick[1].element);
+    deleteCardFromDeck(pick[0].element, function() {
+      // alert('nice job beating the time')
+    });
+    deleteCardFromDeck(pick[1].element, function() {
+      alert('You beat the clock!')
+      restartGame()
+    });
     pick = [];
   }
 }
 
-function deleteCardFromDeck(card) {
+function deleteCardFromDeck(card, callback) {
   setTimeout(function() {
     card.style.opacity = 0;
 
-  }, 400),
+  }, 200),
   card.classList.add('hidden')
   if(duplicates.length == 0) {
-    return restartGame()
+    return callback()
   } else {
     duplicates.splice(duplicates.indexOf(card.children[0].className), 1)
     console.log(duplicates)
@@ -149,6 +170,7 @@ function deleteCardFromDeck(card) {
 function hideCard(card) {
   setTimeout(function() {
     card.children[1].style.display = 'block';
+    card.classList.remove('picked')
   }, 800);
 }
 
@@ -176,12 +198,13 @@ function startGame() {
 }
 
 
-var totalTime = '30' //seconds 
 // create the timer
 function createTimer() {
-  setInterval(function() {
+  var totalTime = '30' //seconds 
+  var timeInterval = setInterval(function() {
     if(totalTime == 0) {
       restartGame()
+      clearTimeInterval(timeInterval)
     } else {
       totalTime = totalTime - 1
       let timer = document.querySelector('.timer')
@@ -191,9 +214,13 @@ function createTimer() {
   }, 1000)
 }
 
+function clearTimeInterval(interval) {
+  clearInterval(interval)
+}
+
 function removeGame() {
   gameContainer.innerHTML = ''
-  totalTime = '30'
+
 }
 
 function restartGame() {
@@ -207,4 +234,5 @@ function restartGame() {
 }
 
 startGame()
+// try an empty array and push clicks into it
 
